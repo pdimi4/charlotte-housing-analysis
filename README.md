@@ -4,14 +4,16 @@ A data science project analyzing how economic, educational, housing, and public-
 
 ## Project Overview
 
-This project analyzes neighborhood-level data in Charlotte to explore factors associated with housing prices and apply machine learning models to housing-related prediction problems.
+This project uses neighborhood-level data from Charlotte to investigate factors associated with housing prices and apply machine learning models to housing-related prediction problems.
 
 The project has two primary objectives:
 
 1. **Regression:** Predict 2023 neighborhood housing prices.
 2. **Classification:** Classify neighborhoods as having 2023 housing prices above or below the dataset median.
 
-Data from multiple sources was combined using Charlotte Neighborhood Profile Area (NPA) identifiers to create a unified dataset for analysis and modeling.
+Multiple datasets were cleaned and combined using Charlotte Neighborhood Profile Area (NPA) identifiers to create a unified dataset for analysis and machine learning.
+
+The final combined dataset contains **459 neighborhoods**, with **409 complete observations** available for modeling after removing rows with missing values.
 
 ## Technologies Used
 
@@ -25,20 +27,27 @@ Data from multiple sources was combined using Charlotte Neighborhood Profile Are
 
 ## Data Preparation
 
-Multiple neighborhood-level datasets were cleaned and combined using Python, pandas, and SQLite.
+The project combines five neighborhood-level source datasets:
 
-The data pipeline:
+- Employment
+- High School Graduation Rate
+- Home Sales Price
+- Job Density
+- CMPD Homicide Data
 
-- Cleans percentage and currency values
-- Converts relevant fields into numeric formats
-- Loads datasets into an SQLite database
-- Aggregates homicide incidents by NPA
-- Joins datasets using NPA identifiers
-- Creates a combined dataset for machine learning
+The data-preparation pipeline uses Python, pandas, and SQLite to:
 
-### Features Used
+- Clean percentage and currency values
+- Convert relevant variables to numeric formats
+- Load source datasets into an SQLite database
+- Aggregate homicide incidents by NPA
+- Join datasets using NPA identifiers
+- Create a unified dataset for machine learning
+- Export the processed dataset as `final_fixed_dataset.csv`
 
-The modeling scripts use the following features:
+## Features Used
+
+The machine learning models use the following predictors:
 
 - 2023 employment rate
 - 2023 high school graduation rate
@@ -46,110 +55,90 @@ The modeling scripts use the following features:
 - Homicide count
 - 2021 home price
 
-The regression target is the neighborhood's 2023 home price.
+For regression, the target variable is **2023 home price**.
+
+For classification, 2023 home prices are converted into a binary target based on the dataset median:
+
+- `1` = Home price above the median
+- `0` = Home price at or below the median
 
 ## Regression Analysis
 
-The regression portion of the project predicts 2023 neighborhood housing prices.
-
-### Models
+Three regression algorithms were evaluated:
 
 - Linear Regression
 - K-Nearest Neighbors (KNN) Regression
 - Random Forest Regression
 
-KNN hyperparameter tuning is performed using `GridSearchCV` with 5-fold cross-validation.
+KNN hyperparameter tuning was performed using `GridSearchCV` with 5-fold cross-validation.
 
-### Evaluation
-
-Regression models are evaluated using:
+Models were evaluated using:
 
 - Root Mean Squared Error (RMSE)
 - R²
-- 5-fold cross-validation
+- Cross-validation
 
-The regression analysis also includes:
+The regression analysis also includes Random Forest feature importance, actual-vs-predicted visualization, residual analysis, and model RMSE comparison.
 
-- Random Forest feature importance
-- Actual vs. predicted visualization
-- Residual analysis
-- Model RMSE comparison
+### Regression Results
+
+| Model | Test RMSE | Test R² |
+| --- | ---: | ---: |
+| Linear Regression | $280,805 | 0.395 |
+| K-Nearest Neighbors | $327,007 | 0.180 |
+| Random Forest | $300,969 | 0.310 |
+
+Among the evaluated regression models, **Linear Regression produced the lowest held-out RMSE and highest held-out R²**.
+
+Its R² of approximately **0.395** indicates that the model explained about 39.5% of the observed variation in 2023 neighborhood housing prices in the test data.
+
+Random Forest feature-importance analysis identified **2021 home price** as the strongest predictor. Employment and high school graduation rates were also important, while job density and homicide count contributed less.
 
 ## Classification Analysis
 
-The classification portion converts 2023 housing prices into a binary target based on the dataset median.
-
-`high_price_2023`
-
-- `1` = Home price above the median
-- `0` = Home price at or below the median
-
-### Models
+Three classification algorithms were evaluated:
 
 - Logistic Regression
 - K-Nearest Neighbors (KNN)
 - Random Forest Classifier
 
-KNN hyperparameter tuning is performed using `GridSearchCV` with ROC-AUC as the scoring metric.
+KNN hyperparameter tuning was performed using `GridSearchCV` with ROC-AUC as the scoring metric.
 
-### Evaluation
-
-Classification models are evaluated using:
+Models were evaluated using:
 
 - Accuracy
 - ROC-AUC
 - Confusion matrices
 - Classification reports
 - 5-fold cross-validation
+- ROC curves
 
-The classification analysis also compares ROC curves and examines Random Forest feature importance.
+### Classification Results
+
+| Model | Test Accuracy | Test ROC-AUC |
+| --- | ---: | ---: |
+| Logistic Regression | 62.2% | 0.651 |
+| K-Nearest Neighbors (k=5) | 65.9% | 0.685 |
+| Random Forest | 63.4% | 0.662 |
+
+Among the evaluated classification models, **K-Nearest Neighbors achieved the highest held-out ROC-AUC**, approximately **0.685**, along with an accuracy of approximately **65.9%**.
+
+Across the regression and classification analyses, previous housing prices were the most informative predictor of 2023 neighborhood housing-price outcomes.
 
 ## Repository Structure
 
-| File | Description |
-| --- | --- |
-| `FinalFixedDatasetSQL.py` | Cleans and combines neighborhood datasets using pandas and SQLite |
-| `RegressionModel.py` | Trains and evaluates regression models for 2023 housing-price prediction |
-| `ClassificationModel.py` | Trains and evaluates classification models for above/below-median housing prices |
-
-## Project Background
-
-This project was originally completed as a group final project for **DTSC 2302: Modeling and Society** at the **University of North Carolina at Charlotte**.
-
-### Project Team
-
-- Pavle Dimitrijevic
-- Ikumi Uemura
-- Michael Forshay
-- Sonia Sun
-- James Harris
-
-This repository is a portfolio-oriented version of the project maintained by Pavle Dimitrijevic. The original academic project was collaborative, and credit for the group work belongs to all team members listed above.
-
-## Skills Demonstrated
-
-- Python programming
-- Data cleaning and preprocessing
-- SQL-based data integration
-- pandas and NumPy
-- Regression modeling
-- Classification modeling
-- Machine learning model evaluation
-- Hyperparameter tuning
-- Cross-validation
-- Feature importance analysis
-- Data visualization
-- Working with real-world neighborhood data
-- Collaborative data science development
-
-## Future Improvements
-
-This portfolio version is being improved to make the analysis more reproducible and easier to run outside the original development environment.
-
-Planned improvements include:
-
-- Replacing local file paths with a portable project structure
-- Saving the processed dataset directly from the data-preparation pipeline
-- Adding final model-performance results
-- Adding selected model visualizations
-- Adding dependency documentation
+```text
+charlotte-housing-analysis/
+│
+├── data/
+│   ├── CMPD_Homicide.csv
+│   ├── Employment.csv
+│   ├── High School Graduation Rate.csv
+│   ├── Home Sales Price.csv
+│   └── Job Density.csv
+│
+├── ClassificationModel.py
+├── FinalFixedDatasetSQL.py
+├── RegressionModel.py
+├── final_fixed_dataset.csv
+└── README.md
