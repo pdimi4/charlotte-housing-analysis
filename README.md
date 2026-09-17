@@ -4,14 +4,14 @@ A data science project analyzing how economic, educational, housing, and public-
 
 ## Project Overview
 
-This project uses neighborhood-level data from Charlotte to investigate factors associated with housing prices and to build predictive models for neighborhood housing values.
+This project analyzes neighborhood-level data in Charlotte to explore factors associated with housing prices and apply machine learning models to housing-related prediction problems.
 
-The analysis has two primary objectives:
+The project has two primary objectives:
 
 1. **Regression:** Predict 2023 neighborhood housing prices.
-2. **Classification:** Classify neighborhoods as above or below the median 2023 housing price.
+2. **Classification:** Classify neighborhoods as having 2023 housing prices above or below the dataset median.
 
-Data from multiple sources was combined at the Charlotte Neighborhood Profile Area (NPA) level to create a unified dataset for analysis and modeling.
+Data from multiple sources was combined using Charlotte Neighborhood Profile Area (NPA) identifiers to create a unified dataset for analysis and modeling.
 
 ## Technologies Used
 
@@ -21,97 +21,100 @@ Data from multiple sources was combined at the Charlotte Neighborhood Profile Ar
 - scikit-learn
 - SQL / SQLite
 - Matplotlib
-- Seaborn
 - Git / GitHub
 
-## Data Sources
+## Data Preparation
 
-The project incorporates neighborhood-level information from sources including:
+Multiple neighborhood-level datasets were cleaned and combined using Python, pandas, and SQLite.
 
-- Charlotte-Mecklenburg Quality of Life data
-- City of Charlotte Open Data
-- Charlotte-Mecklenburg Police Department (CMPD) homicide records
+The data pipeline:
 
-### Variables Analyzed
+- Cleans percentage and currency values
+- Converts relevant fields into numeric formats
+- Loads datasets into an SQLite database
+- Aggregates homicide incidents by NPA
+- Joins datasets using NPA identifiers
+- Creates a combined dataset for machine learning
 
-Key variables include:
+### Features Used
 
-- Employment rate
-- High school graduation rate
-- Job density
-- Home sales prices
+The modeling scripts use the following features:
+
+- 2023 employment rate
+- 2023 high school graduation rate
+- 2022 job density
 - Homicide count
-- Previous-year housing prices
+- 2021 home price
 
-Datasets were merged using Charlotte's Neighborhood Profile Area (NPA) identifiers. Homicide incidents were aggregated to the neighborhood level before being incorporated into the modeling dataset.
+The regression target is the neighborhood's 2023 home price.
 
 ## Regression Analysis
 
-The regression portion of the project predicts `home_price_2023`.
-
-### Features
-
-- `employment_2023`
-- `grad_2023`
-- `job_density_2022`
-- `homicide_count`
-- `home_price_2021`
+The regression portion of the project predicts 2023 neighborhood housing prices.
 
 ### Models
 
 - Linear Regression
-- K-Nearest Neighbors Regression
-- Decision Tree Regression
+- K-Nearest Neighbors (KNN) Regression
 - Random Forest Regression
+
+KNN hyperparameter tuning is performed using `GridSearchCV` with 5-fold cross-validation.
 
 ### Evaluation
 
-Models are evaluated using:
+Regression models are evaluated using:
 
 - Root Mean Squared Error (RMSE)
 - R²
-- Cross-validation
+- 5-fold cross-validation
 
-The analysis also examines feature importance to better understand which neighborhood characteristics are most strongly associated with housing prices.
+The regression analysis also includes:
+
+- Random Forest feature importance
+- Actual vs. predicted visualization
+- Residual analysis
+- Model RMSE comparison
 
 ## Classification Analysis
 
-The classification portion predicts whether a neighborhood's 2023 housing price is above or below the citywide median.
-
-### Target
+The classification portion converts 2023 housing prices into a binary target based on the dataset median.
 
 `high_price_2023`
 
-- `1` = Above median housing price
-- `0` = Below median housing price
+- `1` = Home price above the median
+- `0` = Home price at or below the median
 
 ### Models
 
 - Logistic Regression
-- K-Nearest Neighbors
-- Decision Tree
-- Random Forest
+- K-Nearest Neighbors (KNN)
+- Random Forest Classifier
+
+KNN hyperparameter tuning is performed using `GridSearchCV` with ROC-AUC as the scoring metric.
 
 ### Evaluation
 
-Classification performance is evaluated using:
+Classification models are evaluated using:
 
 - Accuracy
 - ROC-AUC
 - Confusion matrices
-- Cross-validation
+- Classification reports
+- 5-fold cross-validation
+
+The classification analysis also compares ROC curves and examines Random Forest feature importance.
 
 ## Repository Structure
 
 | File | Description |
 | --- | --- |
-| `FinalFixedDatasetSQL.py` | Data preparation, SQL-based dataset merging, and feature construction |
-| `RegressionModel.py` | Regression modeling and evaluation |
-| `ClassificationModel.py` | Classification modeling, tuning, and evaluation |
+| `FinalFixedDatasetSQL.py` | Cleans and combines neighborhood datasets using pandas and SQLite |
+| `RegressionModel.py` | Trains and evaluates regression models for 2023 housing-price prediction |
+| `ClassificationModel.py` | Trains and evaluates classification models for above/below-median housing prices |
 
 ## Project Background
 
-This analysis was originally completed as a group final project for **DTSC 2302: Modeling and Society** at the **University of North Carolina at Charlotte**.
+This project was originally completed as a group final project for **DTSC 2302: Modeling and Society** at the **University of North Carolina at Charlotte**.
 
 ### Project Team
 
@@ -121,16 +124,32 @@ This analysis was originally completed as a group final project for **DTSC 2302:
 - Sonia Sun
 - James Harris
 
-This repository is a portfolio-oriented version of the project maintained by Pavle Dimitrijevic. The original project was collaborative, and credit for the group work belongs to all team members listed above.
+This repository is a portfolio-oriented version of the project maintained by Pavle Dimitrijevic. The original academic project was collaborative, and credit for the group work belongs to all team members listed above.
 
 ## Skills Demonstrated
 
-- Data cleaning and integration
-- SQL-based data preparation
-- Exploratory data analysis
+- Python programming
+- Data cleaning and preprocessing
+- SQL-based data integration
+- pandas and NumPy
 - Regression modeling
 - Classification modeling
-- Model evaluation
-- Cross-validation and model tuning
-- Working with real-world public datasets
-- Collaborative data science workflow
+- Machine learning model evaluation
+- Hyperparameter tuning
+- Cross-validation
+- Feature importance analysis
+- Data visualization
+- Working with real-world neighborhood data
+- Collaborative data science development
+
+## Future Improvements
+
+This portfolio version is being improved to make the analysis more reproducible and easier to run outside the original development environment.
+
+Planned improvements include:
+
+- Replacing local file paths with a portable project structure
+- Saving the processed dataset directly from the data-preparation pipeline
+- Adding final model-performance results
+- Adding selected model visualizations
+- Adding dependency documentation
