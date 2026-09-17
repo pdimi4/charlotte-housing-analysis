@@ -2,18 +2,21 @@
 
 import pandas as pd
 import sqlite3
+from pathlib import Path
 
 # -------------------------
-# 1. Load datasets (YOUR PATHS)
+# 1. File Paths
 # -------------------------
-employment = pd.read_csv("/Users/pavledimitrijevic/Downloads/Employment.csv")
-graduation = pd.read_csv("/Users/pavledimitrijevic/Downloads/High School Graduation Rate.csv")
-housing = pd.read_csv("/Users/pavledimitrijevic/Downloads/Home Sales Price.csv")
-job_density = pd.read_csv("/Users/pavledimitrijevic/Downloads/Job Density.csv")
-crime = pd.read_csv("/Users/pavledimitrijevic/Downloads/CMPD_Homicide.csv")
+DATA_DIR = Path("data")
+
+employment = pd.read_csv(DATA_DIR / "Employment.csv")
+graduation = pd.read_csv(DATA_DIR / "High School Graduation Rate.csv")
+housing = pd.read_csv(DATA_DIR / "Home Sales Price.csv")
+job_density = pd.read_csv(DATA_DIR / "Job Density.csv")
+crime = pd.read_csv(DATA_DIR / "CMPD_Homicide.csv")
 
 # -------------------------
-# 2. CLEAN DATA (for SQL only)
+# 2. Clean Data
 # -------------------------
 employment["2023"] = employment["2023"].replace("--", None)
 graduation["2023"] = graduation["2023"].replace("--", None)
@@ -31,7 +34,7 @@ housing["2021"] = pd.to_numeric(housing["2021"], errors="coerce")
 housing["2023"] = pd.to_numeric(housing["2023"], errors="coerce")
 
 # -------------------------
-# 3. SQL database
+# 3. Create SQLite Database
 # -------------------------
 conn = sqlite3.connect(":memory:")
 
@@ -46,14 +49,14 @@ crime.to_sql("Crime", conn, index=False, if_exists="replace")
 # -------------------------
 query = """
 WITH crime_agg AS (
-    SELECT 
+    SELECT
         NPA,
         COUNT(*) AS homicide_count
     FROM Crime
     GROUP BY NPA
 )
 
-SELECT 
+SELECT
     e.NPA,
     e."2023" AS employment_2023,
     g."2023" AS grad_2023,
@@ -74,26 +77,27 @@ ORDER BY e.NPA
 # -------------------------
 final_dataset = pd.read_sql(query, conn)
 
-# -------------------------
-# 6. FORMAT
-# -------------------------
+# Convert remaining model features to numeric values
+final_dataset["job_density_2022"] = pd.to_numeric(
+    final_dataset["job_density_2022"], errors="coerce"
+)
 
-# Add % back
-final_dataset["employment_2023"] = final_dataset["employment_2023"].round(1).astype(str) + "%"
-final_dataset["grad_2023"] = final_dataset["grad_2023"].round(1).astype(str) + "%"
-
-# Add $ + commas back
-final_dataset["home_price_2021"] = final_dataset["home_price_2021"].apply(lambda x: f"${x:,.0f}")
-final_dataset["home_price_2023"] = final_dataset["home_price_2023"].apply(lambda x: f"${x:,.0f}")
-
-# Ensure homicide_count is int
 final_dataset["homicide_count"] = final_dataset["homicide_count"].astype(int)
 
 # -------------------------
-# 7. Output
+# 6. Save Processed Dataset
+# -------------------------
+final_dataset.to_csv("final_fixed_dataset.csv", index=False)
+
+# -------------------------
+# 7. Output Preview
 # -------------------------
 print("\nFinal Dataset Preview:")
 print(final_dataset.head())
 
 print("\nData Types:")
 print(final_dataset.dtypes)
+
+print("\nDataset saved as final_fixed_dataset.csv")
+
+conn.close()
